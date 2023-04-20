@@ -14,6 +14,25 @@ exports.get = (req, res) => {
   }
 };
 
+exports.getOne = (req, res) => {
+  try {
+    const courseId = req.params.id;
+    Courses.findOne({ where: { id: courseId } })
+      .then((data) => {
+        if (!data)
+          return res
+            .status(400)
+            .json({ status: "Course not found", msg: "Try another id" });
+        res.json({ status: "Fetch success", data });
+      })
+      .catch((err) => {
+        res.status(400).json({ status: "Fetch error", msg: err });
+      });
+  } catch (err) {
+    res.status(500).json({ status: "Server error", msg: err });
+  }
+};
+
 exports.create = (req, res) => {
   try {
     Courses.addCourse(req.body)
