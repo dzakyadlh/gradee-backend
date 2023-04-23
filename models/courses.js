@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const { CourseDetail } = require("./coursedetail");
 module.exports = (sequelize, DataTypes) => {
   class Courses extends Model {
     /**
@@ -9,17 +10,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      models.Courses.hasOne(models.CourseDetail, {
+        foreignKey: "course_id",
+        as: "course_detail",
+      });
     }
 
-    static addCourse = async ({ name, detail, price, image }) => {
-      if (name === "" || detail === "" || price === "")
-        return Promise.reject("Fill all the empty fields");
+    static addCourse = async ({ name, price, image }) => {
+      if (name === "") return Promise.reject("Course name cannot be empty!");
 
       const isCourseExist = await this.findOne({ where: { name: name } });
       if (!isCourseExist) {
         return this.create({
           name,
-          detail,
           price,
           image,
         });
@@ -28,16 +31,15 @@ module.exports = (sequelize, DataTypes) => {
       }
     };
 
-    static updateCourse = async ({ id, name, detail, price, image }) => {
+    static updateCourse = async ({ id, name, price, image }) => {
       const course = await this.findOne({ where: { id } });
       if (course) {
-        course.update({
+        await course.update({
           ...(name && { name }),
-          ...(detail && { detail }),
           ...(price && { price }),
           ...(image && { image }),
         });
-        return course;
+        return Promise.resolve(course);
       }
       return Promise.reject("Course not found");
     };
@@ -46,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       const course = await this.findOne({ where: { id } });
       if (course) {
         await course.destroy();
-        return `${course.name} has been deleted`;
+        return course.name;
       }
       return Promise.reject("Course not found");
     };
@@ -54,7 +56,6 @@ module.exports = (sequelize, DataTypes) => {
   Courses.init(
     {
       name: DataTypes.STRING,
-      detail: DataTypes.STRING,
       price: DataTypes.INTEGER,
       image: DataTypes.STRING,
     },
