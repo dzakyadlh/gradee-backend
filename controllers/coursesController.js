@@ -1,5 +1,6 @@
 const { Courses } = require("../models");
 const { CourseDetail } = require("../models");
+const { Mentors } = require("../models");
 
 exports.get = (req, res) => {
   try {
@@ -8,6 +9,13 @@ exports.get = (req, res) => {
         {
           model: CourseDetail,
           as: "course_detail",
+          attributes: {
+            exclude: ["id", "createdAt", "updatedAt", "course_id"],
+          },
+        },
+        {
+          model: Mentors,
+          as: "course_mentors",
           attributes: {
             exclude: ["id", "createdAt", "updatedAt", "course_id"],
           },
@@ -34,6 +42,13 @@ exports.getOne = (req, res) => {
         {
           model: CourseDetail,
           as: "course_detail",
+          attributes: {
+            exclude: ["id", "createdAt", "updatedAt", "course_id"],
+          },
+        },
+        {
+          model: Mentors,
+          as: "course_mentors",
           attributes: {
             exclude: ["id", "createdAt", "updatedAt", "course_id"],
           },
@@ -112,9 +127,9 @@ exports.delete = (req, res) => {
   try {
     Courses.deleteCourse({ id: req.params.id })
       .then((res) => {
-        CourseDetail.deleteCourse({ course_id: req.params.id, name: res })
+        CourseDetail.deleteCourse({ course_id: req.params.id })
           .then((res) => {
-            res.json({ status: "Delete course success", msg: err });
+            res.json({ status: "Delete course success", msg: res });
           })
           .catch((err) => {
             return res

@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "course_id",
         as: "course_detail",
       });
+      models.Courses.hasMany(models.Mentors, {
+        foreignKey: "course_id",
+        as: "course_mentors",
+      });
     }
 
     static addCourse = async ({ name, price, image }) => {
@@ -48,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
       const course = await this.findOne({ where: { id } });
       if (course) {
         await course.destroy();
-        return course.name;
+        return Promise.resolve("Course has been deleted");
       }
       return Promise.reject("Course not found");
     };

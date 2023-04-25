@@ -48,11 +48,11 @@ module.exports = (sequelize, DataTypes) => {
       }
     };
 
-    static deleteCourse = async ({ course_id, name }) => {
+    static deleteCourse = async ({ course_id }) => {
       const course = await this.findOne({ where: { course_id } });
       if (course) {
         await course.destroy();
-        return `${name} has been deleted`;
+        return Promise.resolve("Course has been deleted");
       }
       return Promise.reject("Course not found");
     };
